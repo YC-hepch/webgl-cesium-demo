@@ -1,0 +1,225 @@
+
+<!--
+ * @Descripttion: 判断落在当前视图范围中的点获取点集和距离视角点最近的点
+ * @version: 1.0
+ * @Author: 予程_hepch
+ * @Date: 2022-01-21 17:41:10
+ * @LastEditors: 予程_hepch
+ * @LastEditTime: 2022-01-21 17:43:10
+ * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head> 
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SceneCameraParams</title>
+  <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
+  <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+  <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
+  <!--jquery库文件 建议下载到本地，引入本地资源  -->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <!-- 构建页面的css样式文件 -->
+  <link rel="stylesheet" href="./css/main.css" />
+  <!-- 使用unpkg -->
+  <script src="https://unpkg.com/@turf/turf/turf.min.js"></script>
+  <!-- 在BootCDN上下载指定版本 -->
+  <script src="https://www.bootcdn.cn/Turf.js/"></script>
+</head>
+
+<body>
+  <div id="mapViewer"></div>
+</body>
+<script>
+  let posttion;
+  let heading, pith, roll;
+  window.viewer = new Cesium.Viewer("mapViewer");
+  let promise = viewer.scene.open(
+    "https://www.supermapol.com/realspace/services/3D-CBDCache20200416/rest/realspace"
+  );
+  Cesium.when(promise, function (layers) { });
+  function getPointsByDIV() {
+    let div = document.getElementById("mapViewer");
+    let xleft = div.getBoundingClientRect().left;
+    let ytop = div.getBoundingClientRect().top;
+    let xright = div.clientWidth + xleft;
+    let ybottom = div.clientHeight + ytop;
+    window.pointArray = [
+      {
+        x: xleft,
+        y: ytop,
+      },
+      {
+        x: xright,
+        y: ybottom,
+      },
+    ];
+  }
+  getPointsByDIV();
+  var pt1 = new Cesium.Cartesian2(pointArray[0].x, pointArray[0].y);
+  var pt2 = new Cesium.Cartesian2(pointArray[1].x, pointArray[1].y);
+  viewer.scene.camera.moveEnd.addEventListener(function () {
+    console.log(
+      "destination",
+      {
+        x: viewer.camera.position.x,
+        y: viewer.camera.position.y,
+        z: viewer.camera.position.z,
+      },
+      "orientation",
+      {
+        heading: viewer.camera.heading,
+        pitch: viewer.camera.pitch,
+        roll: viewer.camera.roll,
+      }
+    );
+
+    viewer.entities.removeAll();
+    var height = viewer.camera.positionCartographic.height;
+    if (height > 1000) return;
+
+
+    var pick1 = viewer.scene.globe.pick(
+      viewer.camera.getPickRay(pt1),
+      viewer.scene
+    );
+    var pick2 = viewer.scene.globe.pick(
+      viewer.camera.getPickRay(pt2),
+      viewer.scene
+    );
+    //将三维坐标转成地理坐标
+    if (!pick1 || !pick2) {
+      return;
+    }
+    //将三维坐标转成地理坐标
+    var geoPt1 = viewer.scene.globe.ellipsoid.cartesianToCartographic(pick1);
+    var geoPt2 = viewer.scene.globe.ellipsoid.cartesianToCartographic(pick2);
+
+    //地理坐标转换为经纬度坐标
+    var point1 = [
+      (geoPt1.longitude / Math.PI) * 180,
+      (geoPt1.latitude / Math.PI) * 180,
+    ];
+    var point2 = [
+      (geoPt2.longitude / Math.PI) * 180,
+      (geoPt2.latitude / Math.PI) * 180,
+    ];
+    console.log("对角线坐标", point1, point2);
+    var polygonpoint1 = point1;
+    var polygonpoint2 = [point1[0], point2[1]];
+    var polygonpoint3 = point2;
+    var polygonpoint4 = [point2[0], point1[1]];
+    var pointsArryObj = [
+      { x: 116.45277777589499, y: 39.91578393076467, z: 50 },
+      { x: 116.45397122552367, y: 39.91741300786648, z: 180 }
+    ];
+    var poly = turf.polygon([
+      [
+        polygonpoint1,
+        polygonpoint2,
+        polygonpoint3,
+        polygonpoint4,
+        polygonpoint1,
+      ],
+    ]);
+    var pointinRange = [];
+    pointsArryObj.map(item => {
+      var pt = turf.point([item.x, item.y]);
+      let isIN = turf.booleanPointInPolygon(pt, poly);
+      if (isIN) {
+        pointinRange.push(item);
+      }
+    });
+    console.log("获取到的屏幕范围内的点", pointinRange)
+    let i = 0;
+    let des = ""
+    let position = { x: viewer.camera.position.x, y: viewer.camera.position.y, z: viewer.camera.position.z }
+    var cartographic = Cesium.Cartographic.fromCartesian(position);
+    var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+    var latitude = Cesium.Math.toDegrees(cartographic.latitude)
+    var creamPoint = [longitude, latitude]
+    if (pointinRange.length) {
+      pointinRange.map(item => {
+        let distance =
+          turf.distance(turf.point([item.x, item.y]), turf.point([creamPoint[0], creamPoint[1]]), {
+            units: "kilometers",
+          }) * 1000;
+        item.distanceToCream = distance;
+        viewer.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(item.x, item.y, item.z),
+          billboard: {
+            image: "./images/location4.png",
+            width: 30,
+            height: 40,
+          },
+          name: i++,
+          description: des,
+        });
+      })
+      sort(pointinRange)
+    }
+    var points = turf.points([
+      [116.45277777589499, 39.91578393076467],
+      [116.4527712683993, 39.916154802023115],
+      [116.45285622314769, 39.91613030543583],
+      [116.45396987004187, 39.91746687807539],
+      [116.45397122552367, 39.91741300786648],
+    ]);
+    var searchWithin = turf.polygon([
+      [
+        polygonpoint1,
+        polygonpoint2,
+        polygonpoint3,
+        polygonpoint4,
+        polygonpoint1,
+      ],
+    ]);
+    var ptsWithin = turf.pointsWithinPolygon(points, searchWithin);
+    console.log(ptsWithin);
+    i = 0;
+    ptsWithin.features.map((item) => {
+      let des = "";
+      let point = item.geometry.coordinates;
+      viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(point[0], point[1], 50),
+        billboard: {
+          image: "./images/location4.png",
+          width: 30,
+          height: 40,
+        },
+        name: i++,
+        description: des,
+      });
+    });
+  });
+  function sort(array) {
+    //转换单位 米
+    //比较轮数
+    for (var i = 0; i < array.length - 1; i++) {
+      //每轮比较次数，次数=长度-1-此时的轮数
+      for (var j = 0; j < array.length - 1 - i; j++) {
+        if (array[j].distanceToCream > array[j + 1].distanceToCream) {
+          var temp = array[i];
+          array[j] = array[j + 1];
+          array[j + 1] = temp;
+        } //end if
+      }//end for 次数
+    } //end for 轮数
+    console.log("根据距离排序取第一点渲染", array);
+    viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(array[0].x, array[0].y, array[0].z),
+      billboard: {
+        image: "./images/location4.png",
+        width: 30,
+        height: 40,
+      },
+      name: "最近点",
+      description: "",
+    });
+
+  }
+</script>
+
+</html>
