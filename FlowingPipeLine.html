@@ -1,0 +1,50 @@
+<!--
+ * @Descripttion:流动管线，解决方案：桌面数据处理中，给管线贴箭头符号
+ * @version: 1.0
+ * @Author: 予程_hepch
+ * @Date: 2022-01-24 10:57:40
+ * @LastEditors: 予程_hepch
+ * @LastEditTime: 2022-01-24 11:35:44
+ * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowingPipeLine</title>
+    <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
+    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
+    <!-- 构建页面的css样式文件 -->
+    <link rel="stylesheet" href="./css/main.css" />
+</head>
+
+<body>
+    <div id="mapViewer"></div>
+    <div>
+        <!-- 表格展示参数 -->
+        <table id="table" border="1">
+        </table>
+    </div>
+    <script>
+        window.viewer = new Cesium.Viewer("mapViewer");
+        var scene=window.viewer.scene
+        var promise = scene.open('http://www.supermapol.com/realspace/services/3D-ChunShuiLvSeGuanDaounknowns3munknown/rest/realspace');
+        Cesium.when(promise, function (layer) {
+                //设置相机位置，定位至模型
+                scene.camera.setView({
+                    destination: new Cesium.Cartesian3(-2343784.953917227, 4546449.518116666, 3810304.124116188),
+                    orientation: {
+                        heading: 4.750885487110618,
+                        pitch: -0.38228770591445227,
+                        roll: 1.0480505352461478e-13
+                    }
+                });
+                var line = scene.layers.find("纯水绿色管道优化@管线");
+                //模型纹理在UV坐标上的运动速度
+                line.textureUVSpeed = new Cesium.Cartesian2(0, -2);
+            })
+    </script>
+</body>

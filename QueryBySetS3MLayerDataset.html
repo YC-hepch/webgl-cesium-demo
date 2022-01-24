@@ -1,0 +1,101 @@
+<!--
+ * @Descripttion: 设置S3M图层对应的数据服务数据源和数据集，查询属性数据
+ * @version: 1.0
+ * @Author: 予程_hepch
+ * @Date: 2022-01-24 11:54:49
+ * @LastEditors: 予程_hepch
+ * @LastEditTime: 2022-01-24 14:58:20
+ * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SceneCameraParams</title>
+    <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
+    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
+     <!--jquery库文件 建议下载到本地，引入本地资源  -->
+     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <!-- 构建页面的css样式文件 -->
+    <link rel="stylesheet" href="./css/main.css" />
+</head>
+
+<body>
+    <div id="mapViewer"></div>
+    <div>
+        <!-- 表格展示参数 -->
+        <table id="table" border="1">
+        </table>
+    </div>
+    <script>
+        window.viewer = new Cesium.Viewer("mapViewer", {
+            infoBox: false
+        });
+        //监听场景视角改变后触发事件
+        var scene = window.viewer.scene;
+        var  widget = viewer.cesiumWidget;
+        try {
+            var promise = scene.open("http://www.supermapol.com/realspace/services/3D-jinjiang/rest/realspace")
+            Cesium.when(promise, function (layers) {
+                var layer = scene.layers.find('jinjiang');
+                pickEvent()
+                //设置S3M图层对应的数据服务属性查询参数
+                setQueryParameter(layer)
+                //设置相机视角
+                setCameraParams()
+
+            }, function (e) {
+                if (widget._showRenderLoopErrors) {
+                    var title = '渲染时发生错误，已停止渲染。';
+                    widget.showErrorPanel(title, undefined, e);
+                }
+            })
+        }
+        catch (e) {
+            if (widget._showRenderLoopErrors) {
+                var title = '渲染时发生错误，已停止渲染。';
+                widget.showErrorPanel(title, undefined, e);
+            }
+        }
+        function setCameraParams() {
+            scene.camera.setView({
+                //将经度、纬度、高度的坐标转换为笛卡尔坐标
+                destination: new Cesium.Cartesian3(-2767302.844416157, 5085941.49155452, 2675759.1559041184),
+                orientation: {
+                    heading: 4.7793869967010565,
+                    pitch: -0.5899023527373464,
+                    roll: 8.539835505416704e-12
+                }
+            });
+        }
+        //设置s3m图层查询参数
+        function setQueryParameter(layer) {
+            layer.setQueryParameter({
+                url: 'http://www.supermapol.com/realspace/services/data-jinjiang/rest/data',
+                dataSourceName: 'jinjiang',//数据源
+                dataSetName: 'test',//数据集
+                keyWord: 'SmID'//关键字
+            });
+        }
+        //点击对象监听事件
+        function pickEvent() {
+            viewer.pickEvent.addEventListener(function (feature) {
+                console.log("feature", feature);
+                appendtable(feature)
+            });
+        }
+        function  appendtable(feature){
+             /* 表格中填入值 */
+             $("table").empty()
+             $("table").append("<tr><th>key</th><th>value</th></tr>");
+             for(let key in feature){
+                $("table").append(`<tr><td>${key}</td><td>${feature[key]}</td></tr>`);
+             }
+        }
+
+    </script>
+</body>

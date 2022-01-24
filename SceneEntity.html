@@ -1,0 +1,148 @@
+
+<!--
+ * @Descripttion: 添加entities示例
+ * @version: 1.0
+ * @Author: 予程_hepch
+ * @Date: 2022-01-21 17:41:10
+ * @LastEditors: 予程_hepch
+ * @LastEditTime: 2022-01-24 14:58:32
+ * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SceneEntity</title>
+    <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
+    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
+    <!--jquery库文件 建议下载到本地，引入本地资源  -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <!-- 构建页面的css样式文件 -->
+    <link rel="stylesheet" href="./css/main.css" />
+</head>
+<style>
+    #buttonGroup {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        background: #0a1f2cc9;
+        border: 1px solid rgb(7, 209, 245);
+        padding: 10px;
+    }
+    #buttonGroup>button {
+        background: #00ffff8f;
+        border: 1px solid rgb(0 217 255);
+        padding: 5px;
+        border-radius: 5px;
+    }
+</style>
+<body>
+   
+    <div id="mapViewer"></div>
+    <div id="buttonGroup">
+        <button id="pickAdd" onclick="addBillboardByPick()">拾取添加</button>
+        <button id="gltf" onclick="addGltfModel()">gltf动画</button>
+        <button id="billboard" onclick="addBillboard()">广告牌添加</button>
+    </div>
+    <script>
+        window.viewer = new Cesium.Viewer("mapViewer",{
+            infoBox:false
+        });
+        var scene = window.viewer.scene;
+        var  widget = viewer.cesiumWidget;
+        try {
+            /* 加载示例场景 */
+            var promise = scene.open("http://www.supermapol.com/realspace/services/3D-OlympicGreen_Plan/rest/realspace");
+            Cesium.when(promise, function (layer) {
+                /* 屏幕事件 */
+                window.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+            });
+        } catch (e) {
+            if (widget._showRenderLoopErrors) {
+                var title = '渲染时发生错误，已停止渲染。';
+                widget.showErrorPanel(title, undefined, e);
+            }
+        }
+        //添加广告牌
+        function addBillboard() {
+            removeInputAction()
+            viewer.entities.removeAll();
+            var postion = new Cesium.Cartesian3(447748.322, 4428385.465, 56);//x、y 投影坐标
+            var convertPostion = Cesium.SceneTransforms.convert2DToCartesian(scene, postion);//转换为笛卡尔坐标
+            var billboard = viewer.entities.add({
+                position: convertPostion,
+                billboard: {
+                    image: './images/station.png',
+                    show: true,
+                    //获取或设置在眼坐标中应用于此广告牌的3D笛卡尔偏移
+                    eyeOffset: new Cesium.Cartesian3(0.0, 0.0, 0.0),
+                    //原点相对于对象（如广告牌或标签）的水平位置
+                    horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+                    //高度参考
+                    //heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                    // 相对于对象的原点的垂直位置
+                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                    scale: 0.3,
+                    //颜色
+                    color: Cesium.Color.YELLOW,
+                    //获取或设置世界空间中的对齐轴。对齐的轴是广告牌向上向量指向的单位向量。默认值为零向量，这意味着广告牌与屏幕向上向量对齐
+                    alignedAxis: Cesium.Cartesian3.ZERO,
+                },
+            })
+            viewer.zoomTo(billboard);
+        }
+        //添加动画模型至场景
+        function addGltfModel() {
+            removeInputAction()
+            viewer.entities.removeAll();
+            var url = "./images/地标动画.gltf";
+            var postion = new Cesium.Cartesian3(447742.322, 4428382.465, 56);//x、y 投影坐标
+            var convertPostion = Cesium.SceneTransforms.convert2DToCartesian(scene, postion);//转换为笛卡尔坐标
+            var gltf = viewer.entities.add({
+                name: "gltf",
+                position: convertPostion,
+                scale: 2,
+                model: {
+                    uri: url
+                }
+            });
+            viewer.zoomTo(gltf);
+        }
+        function addBillboardByPick() {
+            removeInputAction()
+            /* 鼠标点击事件 */
+            handler.setInputAction(function (e) {
+                viewer.entities.removeAll();
+                var position = scene.pickPosition(e.position);//平面拾取的点
+                var point = viewer.entities.add({
+                    position: position,
+                    billboard: {
+                        image: './images/location4.png',
+                        show: true,              
+                        eyeOffset: new Cesium.Cartesian3(0.0, 0.0, 0.0),
+                        horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        scale: 0.3,
+                        color: Cesium.Color.YELLOW,
+                        alignedAxis: Cesium.Cartesian3.ZERO,
+                    },
+                })
+
+            }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        }
+        //移除鼠标事件
+       function removeInputAction(){
+            if(handler){
+                let type=Cesium.ScreenSpaceEventType.LEFT_CLICK
+                handler. removeInputAction(type)
+            }else{
+                return
+            }
+        }
+    </script>
+
+</body>
