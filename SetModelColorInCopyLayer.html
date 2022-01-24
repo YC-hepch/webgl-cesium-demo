@@ -1,0 +1,100 @@
+<!--
+ * @Descripttion: 双图层模型设置同时设置透明度和颜色
+ * @version: 1.0
+ * @Author: 予程_hepch
+ * @Date: 2022-01-21 17:41:10
+ * @LastEditors: 予程_hepch
+ * @LastEditTime: 2022-01-24 14:58:55
+ * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SetModelColorInCopyLayer</title>
+  <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
+  <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+  <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
+  <!--jquery库文件 建议下载到本地，引入本地资源  -->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <!-- 构建页面的css样式文件 -->
+  <link rel="stylesheet" href="./css/main.css" />
+</head>
+<style>
+  #buttonGroup {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      background: #0a1f2cc9;
+      border: 1px solid rgb(7, 209, 245);
+      padding: 10px;
+  }
+  #buttonGroup>button {
+      background: #00ffff8f;
+      border: 1px solid rgb(0 217 255);
+      padding: 5px;
+      border-radius: 5px;
+  }
+</style>
+<body>
+  <div id="mapViewer"></div>
+  <div id="buttonGroup">
+    <button  onclick="setAlpha()">ID1480模型透明度为1</button>
+    <button  onclick="reset()">恢复</button>
+</div>
+  <script type="text/javascript">
+    function onload(Cesium) {
+      var infoboxContainer = document.getElementById("bubble");
+      window.viewer = new Cesium.Viewer("mapViewer");
+      var  widget = viewer.cesiumWidget;
+      var scene = viewer.scene;
+      var promise = scene.open(
+        "http://www.supermapol.com/realspace/services/3D-BIMbuilding/rest/realspace"
+      );
+      Cesium.when(promise, function (layers) {
+        console.log("layers", layers);
+        scene.camera.setView({
+          destination: new Cesium.Cartesian3(-2180753.065987198, 4379023.266141494, 4092583.575045952),
+          orientation: {
+            heading: 4.0392222751147955,
+            pitch: 0.010279641987852584,
+            roll: 1.240962888005015e-11
+          }
+        });
+        //复制同一图层
+        var promiseA = viewer.scene.addS3MTilesLayerByScp('http://www.supermapol.com/realspace/services/3D-BIMbuilding/rest/realspace/datas/BIMbuilding/config');
+        promiseA.then(function (layer) {
+          window.copylayer = layer;
+          copylayer.visible = false;
+        });
+      });
+    }
+    //复原
+    function reset() {
+      copylayer.visible = false;
+      let layer = viewer.scene.layers.find("BIMbuilding");
+      layer.style3D.fillForeColor.alpha = 1
+      //1000000模型最大数量
+      layer.setObjsVisible([10000000], false)
+    }
+    //设置透明度
+    function setAlpha() {
+      let layer = viewer.scene.layers.find("BIMbuilding");
+      layer.style3D.fillForeColor.alpha = 0.5
+      //设置不显示模型控件
+      layer.setObjsVisible([1480], false)
+      copylayer.visible = true;
+      //设置 copylayer只显示控件
+      copylayer.setObjsVisible([1480], true)
+      copylayer.style3D.fillForeColor.alpha = 1
+    }
+    if (typeof Cesium !== "undefined") {
+      window.startupCalled = true;
+      onload(Cesium);
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!--
+ * @Descripttion: 设置S3M模型图层的透明度和选中时的模型颜色设置
+ * @version: 1.0
+ * @Author: 予程_hepch
+ * @Date: 2022-01-21 17:41:10
+ * @LastEditors: 予程_hepch
+ * @LastEditTime: 2022-01-24 17:43:00
+ * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SceneEntity</title>
+
+    <!-- <script src="./Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="./Cesium/Widgets/widgets.css" /> -->
+    <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
+    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
+    <!-- 构建页面的css样式文件 -->
+    <link rel="stylesheet" href="./css/main.css" />
+</head>
+
+<body>
+    <div id="mapViewer"></div>
+    <script type="text/javascript">
+        /* 地图视图 */
+        window.viewer = new Cesium.Viewer("mapViewer", {
+            infoBox: false
+        });
+        var scene = window.viewer.scene;
+        var  widget = viewer.cesiumWidget;
+        try {  /* 加载示例场景 */
+            var promise = scene.open("http://www.supermapol.com/realspace/services/3D-XinBaiMo/rest/realspace");
+            Cesium.when(promise, function (layers) {
+                let layer = viewer.scene.layers.find("一般家屋");
+                //图层白色透明度设置为0.5
+                var color = new Cesium.Color(1, 1, 1, 1);
+                layer.style3D.fillForeColor = color;
+                //图层颜色模式为替换模式
+                layer.selectColorType = Cesium.SelectColorType.REPLACE
+               layer.selectedColor = new Cesium.Color(0, 1, 0, 0.4);
+            });
+        } catch (e) {
+            if (widget._showRenderLoopErrors) {
+                var title = '渲染时发生错误，已停止渲染。';
+                widget.showErrorPanel(title, undefined, e);
+            }
+        }
+    </script>
+</body>
+</html>

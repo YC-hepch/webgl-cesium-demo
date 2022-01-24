@@ -1,0 +1,67 @@
+<!--
+ * @Descripttion:动态路线
+ * @version: 1.0
+ * @Author: 予程_hepch
+ * @Date: 2022-01-24 17:29:10
+ * @LastEditors: 予程_hepch
+ * @LastEditTime: 2022-01-24 17:32:32
+ * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DynamicEntityPolyline</title>
+    <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
+    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
+    <!--jquery库文件 建议下载到本地，引入本地资源  -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <!-- 构建页面的css样式文件 -->
+    <link rel="stylesheet" href="./css/main.css" />
+</head>
+
+<body>
+    <div id="mapViewer"></div>
+    
+<script>
+    const viewer = new Cesium.Viewer('mapViewer');
+    let startLongitude = 113;
+    let startLatitude = 28;
+    let endLongitude;
+    let endLatitude;
+    let pArray = [startLongitude, startLatitude];
+    let startTime = Cesium.JulianDate.now();
+    viewer.imageryLayers.addImageryProvider(new Cesium.TiandituImageryProvider({
+        token: "c3eec6ca025f3324e22a47545b25c6c8"
+    }));
+    let imageryLayers = viewer.imageryLayers;
+
+    let labelImagery = new Cesium.TiandituImageryProvider({
+        mapStyle: Cesium.TiandituMapsStyle.CIA_C,
+        token: "c3eec6ca025f3324e22a47545b25c6c8"
+    });
+    imageryLayers.addImageryProvider(labelImagery);
+    // Add a polyline to the scene. Positions are dynamic.
+    let isConstant = false;
+    let redLine = viewer.entities.add({
+        polyline: {
+            // This callback updates positions each frame.
+            positions: new Cesium.CallbackProperty(function (time, result) {
+                endLongitude = pArray[pArray.length - 2] + Math.random() * 0.001 * Cesium.JulianDate.secondsDifference(time, startTime);
+                endLatitude = pArray[pArray.length - 1] + Math.random() * 0.001 * Cesium.JulianDate.secondsDifference(time, startTime);
+                pArray.push(endLongitude);
+                pArray.push(endLatitude);
+                return Cesium.Cartesian3.fromDegreesArray(pArray, Cesium.Ellipsoid.WGS84, result);
+            }, isConstant),
+            width: 15,
+            material: Cesium.Color.RED
+        }
+    });
+    viewer.zoomTo(redLine);
+</script>
+
+</html>
