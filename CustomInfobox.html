@@ -1,0 +1,134 @@
+<!--
+ * @Descripttion: 气泡
+ * @version: 1.0
+ * @Author: 予程_hepch
+ * @Date: 2022-01-25 11:32:59
+ * @LastEditors: 予程_hepch
+ * @LastEditTime: 2022-01-25 13:07:11
+ * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CustomInfobox</title>
+    <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
+    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
+
+</head>
+
+<body>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000000;
+        }
+        #mapViewer {
+            position: fixed;
+            width: 86%;
+            height: 86%;
+            left: 100px;
+            top: 10px
+        }
+        #bubble {
+            text-align: center;
+            position: absolute;
+            padding: 15px;
+            margin: 0px;
+            background: rgb(255, 255, 255);
+            max-width: 330px;
+            max-height: 200px;
+            z-index: 9999;
+        }
+        .bubble::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            left: 50px;
+            border-width: 0px 20px 50px 0px;
+            border-style: solid;
+            border-color: transparent rgb(255, 255, 255);
+            display: block;
+            width: 0px;
+        }
+    </style>
+    <div id="mapViewer" >
+    <blockquote id="bubble" class="bubble">
+        <h2 id="title"></h2>
+        <p id="des" class="word"></p>
+        </blockquote>
+    </div>
+    <script type="text/javascript">
+        function onload(Cesium) {
+            var infoboxContainer = document.getElementById("bubble");
+            //初始化viewer部件
+            var viewer = new Cesium.Viewer('mapViewer');
+            viewer.customInfobox = infoboxContainer;
+            var scene = viewer.scene;
+            var canvas = scene.canvas;
+            var widget = viewer.cesiumWidget;
+            try {
+                //添加S3M图层服务
+                var promise = scene.open("http://www.supermapol.com/realspace/services/3D-jinjiang/rest/realspace");
+                Cesium.when(promise, function (layers) {
+                    if (!scene.pickPositionSupported) {
+                        alert('不支持深度拾取,属性查询功能无法使用！');
+                    }
+                    var layer = scene.layers.find('jinjiang');
+                    //设置属性查询参数
+                    layer.setQueryParameter({
+                        url: 'http://www.supermapol.com/realspace/services/data-jinjiang/rest/data',
+                        dataSourceName: 'jinjiang',
+                        dataSetName: 'test',
+                        keyWord: 'SmID'
+                    });
+                    //设置相机视角
+                    scene.camera.setView({
+                        //将经度、纬度、高度的坐标转换为笛卡尔坐标
+                        destination: new Cesium.Cartesian3(-2767302.844416157, 5085941.49155452, 2675759.1559041184),
+                        orientation: {
+                            heading: 4.7793869967010565,
+                            pitch: -0.5899023527373464,
+                            roll: 8.539835505416704e-12
+                        }
+                    });
+                }, function (e) {
+                    if (widget._showRenderLoopErrors) {
+                        var title = '渲染时发生错误，已停止渲染。';
+                        widget.showErrorPanel(title, undefined, e);
+                    }
+                });
+            }
+            catch (e) {
+                if (widget._showRenderLoopErrors) {
+                    var title = '渲染时发生错误，已停止渲染。';
+                    widget.showErrorPanel(title, undefined, e);
+                }
+            }
+            //添加自定义infobox
+            var title = document.getElementById("title");
+            var des = document.getElementById("des");
+            //注册鼠标点击事件
+            viewer.pickEvent.addEventListener(function (feature) {
+                var title = Cesium.defaultValue(feature.NAME, '');
+                var description = Cesium.defaultValue(feature.DES, '');
+                title.innerText = title;
+                des.innerText = description;
+
+            });
+        }
+        if (typeof Cesium !== 'undefined') {
+            window.startupCalled = true;
+            onload(Cesium);
+        }
+    </script>
+</body>
+
+</html>
