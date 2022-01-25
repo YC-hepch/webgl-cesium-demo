@@ -4,7 +4,7 @@
  * @Author: 予程_hepch
  * @Date: 2022-01-25 11:32:59
  * @LastEditors: 予程_hepch
- * @LastEditTime: 2022-01-25 13:07:11
+ * @LastEditTime: 2022-01-25 15:40:54
  * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
 -->
 <!DOCTYPE html>
@@ -12,28 +12,28 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>CustomInfobox</title>
-    <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
+    <!-- cesuim库、样式文件 建议下载到本地，引入本地资源  -->
     <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
     <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
-
 </head>
-
 <body>
     <style>
         html,
         body {
+            height: 100%;
+            width: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
             background-color: #000000;
         }
+
         #mapViewer {
             position: fixed;
             width: 86%;
-            height: 86%;
+            height: 100%;
             left: 100px;
             top: 10px
         }
@@ -59,11 +59,11 @@
             width: 0px;
         }
     </style>
-    <div id="mapViewer" >
-    <blockquote id="bubble" class="bubble">
-        <h2 id="title"></h2>
-        <p id="des" class="word"></p>
-        </blockquote>
+    <div id="mapViewer">
+        <div id="bubble" class="bubble">
+            <h2 id="title"></h2>
+            <p id="des" class="word"></p>
+        </div>
     </div>
     <script type="text/javascript">
         function onload(Cesium) {
@@ -121,7 +121,6 @@
                 var description = Cesium.defaultValue(feature.DES, '');
                 title.innerText = title;
                 des.innerText = description;
-
             });
         }
         if (typeof Cesium !== 'undefined') {
