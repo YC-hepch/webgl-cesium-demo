@@ -1,0 +1,149 @@
+<!--
+ * @Descripttion: file content
+ * @version: 1.0
+ * @Author: 予程_hepch
+ * @Date: 2022-01-25 13:45:31
+ * @LastEditors: 予程_hepch
+ * @LastEditTime: 2022-01-25 14:16:14
+ * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--cesium库、样式文件 建议下载到本地，引入本地资源  -->
+    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
+    <!--jquery库文件 建议下载到本地，引入本地资源  -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <!-- 构建页面的css样式文件 -->
+    <link rel="stylesheet" href="./css/main.css" />
+</head>
+
+<body>
+    <div id="mapViewer"></div>
+    <div id="buttonGroup">
+        <button type="button" id="lan-tian" class="button black" onclick="lt()">蓝天</button>
+        <button type="button" id="qing-tian" class="button black" onclick="qt()">晴天</button>
+        <button type="button" id="wan-xia" class="button black" onclick="wx()">晚霞</button>
+        <button type="button" id="default" class="button black" onclick="mr()">默认</button>
+    </div>
+    <script type="text/javascript">
+       
+        if (typeof Cesium !== 'undefined') {
+            window.startupCalled = true;
+            onload(Cesium);
+        }
+        var currentSkyBox, defaultSkyBox, qtSkyBox, ltSkyBox, wxSkyBox, viewer, scene;
+        function onload(Cesium) {
+            //打开时间轴
+            window.viewer = new Cesium.Viewer("mapViewer", {
+                timeline: true,
+                infoxBox:false
+
+            });
+            scene = viewer.scene;
+            //关闭球
+            scene.globe.show = false;
+            //设置太阳是否开启--关闭太阳光
+            scene.sun.show = false;
+            // 01设置环境光的强度-新处理CBD场景
+            scene.lightSource.ambientLightColor = new Cesium.Color(0.75, 0.75, 0.75, 1);
+            //01新处理CBD场景
+            // 添加光源
+            // 东南45方向主光源
+            var position1 = new Cesium.Cartesian3.fromDegrees(116.261209157595, 39.3042238956531, 480);
+            //光源方向点
+            //CBD中设置为湖中亭子顶部
+            var targetPosition1 = new Cesium.Cartesian3.fromDegrees(116.261209157595, 39.3042238956531, 430);
+            var dirLightOptions = {
+                targetPosition: targetPosition1,
+                color: new Cesium.Color(1.0, 1.0, 1.0, 1),
+                // color: new Cesium.Color(1.0, 1.0, 1.0, 1),
+                intensity: 0.5
+            };
+            directionalLight_1 = new Cesium.DirectionalLight(position1, dirLightOptions);
+            scene.addLightSource(directionalLight_1);
+            //开启颜色校正
+            viewer.scene.colorCorrection.show = true;
+            viewer.scene.colorCorrection.saturation = 1;
+            viewer.scene.colorCorrection.brightness = 1.2;
+            viewer.scene.colorCorrection.contrast = 1.1;
+            viewer.scene.colorCorrection.hue = 0;
+            window.camera = viewer.scene.camera;
+            var promise = viewer.scene.open('http://www.supermapol.com/realspace/services/3D-CBD/rest/realspace');
+            promise.then(function (layers) {
+                           scene.camera.setView({
+                               destination : new Cesium.Cartesian3(-2180093.6844788925, 4380068.690796425, 4091870.3366022254),
+                               orientation : {
+                                   heading : 6.074930681823903,
+                                   pitch : 0.013329804060574713,
+                                   roll : 6.2831853071131825
+                               }
+                           });
+                ltSkyBox = new Cesium.SkyBox({
+                    sources: {
+                        positiveX: './images/天空盒素材/蓝天/Right.jpg',
+                        negativeX: './images/天空盒素材/蓝天/Left.jpg',
+                        positiveY: './images/天空盒素材/蓝天/Front.jpg',
+                        negativeY: './images/天空盒素材/蓝天/Back.jpg',
+                        positiveZ: './images/天空盒素材/蓝天/Up.jpg',
+                        negativeZ: './images/天空盒素材/蓝天/Down.jpg'
+                    }
+                });
+
+
+                qtSkyBox = new Cesium.SkyBox({
+                    sources: {
+                        positiveX: './images/天空盒素材/晴天/Right.jpg',
+                        negativeX: './images/天空盒素材/晴天/Left.jpg',
+                        positiveY: './images/天空盒素材/晴天/Front.jpg',
+                        negativeY: './images/天空盒素材/晴天/Back.jpg',
+                        positiveZ: './images/天空盒素材/晴天/Up.jpg',
+                        negativeZ: './images/天空盒素材/晴天/Down.jpg'
+                    }
+                });
+
+                wxSkyBox = new Cesium.SkyBox({
+                    sources: {
+                        positiveX: './images/天空盒素材/晚霞/Right.jpg',
+                        negativeX: './images/天空盒素材/晚霞/Left.jpg',
+                        positiveY: './images/天空盒素材/晚霞/Front.jpg',
+                        negativeY: './images/天空盒素材/晚霞/Back.jpg',
+                        positiveZ: './images/天空盒素材/晚霞/Up.jpg',
+                        negativeZ: './images/天空盒素材/晚霞/Down.jpg'
+                    }
+                });
+                defaultSkyBox = viewer.scene.skyBox;
+                currentSkyBox = defaultSkyBox;
+                scene.skyBox = currentSkyBox;
+                //旋转速度
+                currentSkyBox.WSpeed = 5.0;
+                scene.skyAtmosphere.show = false;
+            });
+        }
+        function lt() {
+            ltSkyBox.WSpeed = 5.0;
+            scene.skyBox = ltSkyBox;
+        }
+
+        function qt() {
+            qtSkyBox.WSpeed = 5.0;
+            scene.skyBox = qtSkyBox;
+        }
+
+        function wx() {
+            wxSkyBox.WSpeed = 5.0;
+            scene.skyBox = wxSkyBox;
+        }
+
+        function mr() {
+            scene.skyBox = defaultSkyBox;
+        }
+
+
+    </script>
+</body>
