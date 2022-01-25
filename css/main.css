@@ -15,6 +15,7 @@ html, body, #mapViewer{
     -ms-user-select:none;
     user-select:none; */
 }
+
 #table{
     position: absolute;
     bottom: 0px;

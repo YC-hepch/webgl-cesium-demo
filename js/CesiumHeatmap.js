@@ -5,7 +5,6 @@
  */
 (function (window) {
 	'use strict';
-
 	function define_CesiumHeatmap() {
 		var CesiumHeatmap = {
 			defaults: {
@@ -154,7 +153,7 @@
 		return CesiumHeatmap;
 	}
 
-	if (typeof(CesiumHeatmap) === 'undefined') {
+	if (typeof (CesiumHeatmap) === 'undefined') {
 		window.CesiumHeatmap = define_CesiumHeatmap();
 	} else {
 		console.log("CesiumHeatmap already defined.");
@@ -384,7 +383,7 @@ CHInstance.prototype.updateLayer = function () {
 	var a = {
 		defaultRadius: 40,
 		defaultRenderer: "canvas2d",
-		defaultGradient: {.25: "rgb(0,0,255)", .55: "rgb(0,255,0)", .85: "yellow", 1: "rgb(255,0,0)"},
+		defaultGradient: { .25: "rgb(0,0,255)", .55: "rgb(0,255,0)", .85: "yellow", 1: "rgb(255,0,0)" },
 		defaultMaxOpacity: 1,
 		defaultMinOpacity: 0,
 		defaultBlur: .85,
@@ -436,7 +435,7 @@ CHInstance.prototype.updateLayer = function () {
 					}
 					return false
 				} else {
-					return {x: d, y: e, value: j, radius: k, min: i, max: h}
+					return { x: d, y: e, value: j, radius: k, min: i, max: h }
 				}
 			}, _unOrganizeData: function () {
 				var a = [];
@@ -444,12 +443,12 @@ CHInstance.prototype.updateLayer = function () {
 				var c = this._radi;
 				for (var d in b) {
 					for (var e in b[d]) {
-						a.push({x: d, y: e, radius: c[d][e], value: b[d][e]})
+						a.push({ x: d, y: e, radius: c[d][e], value: b[d][e] })
 					}
 				}
-				return {min: this._min, max: this._max, data: a}
+				return { min: this._min, max: this._max, data: a }
 			}, _onExtremaChange: function () {
-				this._coordinator.emit("extremachange", {min: this._min, max: this._max})
+				this._coordinator.emit("extremachange", { min: this._min, max: this._max })
 			}, addData: function () {
 				if (arguments[0].length > 0) {
 					var a = arguments[0];
@@ -460,7 +459,7 @@ CHInstance.prototype.updateLayer = function () {
 				} else {
 					var c = this._organiseData(arguments[0], true);
 					if (c) {
-						this._coordinator.emit("renderpartial", {min: this._min, max: this._max, data: [c]})
+						this._coordinator.emit("renderpartial", { min: this._min, max: this._max, data: [c] })
 					}
 				}
 				return this
@@ -491,7 +490,7 @@ CHInstance.prototype.updateLayer = function () {
 			}, setCoordinator: function (a) {
 				this._coordinator = a
 			}, _getInternalData: function () {
-				return {max: this._max, min: this._min, data: this._data, radi: this._radi}
+				return { max: this._max, min: this._min, data: this._data, radi: this._radi }
 			}, getData: function () {
 				return this._unOrganizeData()
 			}
@@ -549,10 +548,10 @@ CHInstance.prototype.updateLayer = function () {
 					var k = i[j];
 					var l = a[h][k];
 					var m = e[h][k];
-					b.push({x: h, y: k, value: l, radius: m})
+					b.push({ x: h, y: k, value: l, radius: m })
 				}
 			}
-			return {min: c, max: d, data: b}
+			return { min: c, max: d, data: b }
 		};
 
 		function d(b) {
