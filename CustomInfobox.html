@@ -4,7 +4,7 @@
  * @Author: 予程_hepch
  * @Date: 2022-01-25 11:32:59
  * @LastEditors: 予程_hepch
- * @LastEditTime: 2022-01-25 15:40:54
+ * @LastEditTime: 2022-02-10 10:28:53
  * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
 -->
 <!DOCTYPE html>
@@ -15,7 +15,7 @@
 
     <title>CustomInfobox</title>
     <!-- cesuim库、样式文件 建议下载到本地，引入本地资源  -->
-    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <script src="https://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
     <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
 </head>
 <body>
@@ -76,7 +76,7 @@
             var widget = viewer.cesiumWidget;
             try {
                 //添加S3M图层服务
-                var promise = scene.open("http://www.supermapol.com/realspace/services/3D-jinjiang/rest/realspace");
+                var promise = scene.open("https://www.supermapol.com/realspace/services/3D-jinjiang/rest/realspace");
                 Cesium.when(promise, function (layers) {
                     if (!scene.pickPositionSupported) {
                         alert('不支持深度拾取,属性查询功能无法使用！');

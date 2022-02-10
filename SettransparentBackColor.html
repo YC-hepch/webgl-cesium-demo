@@ -16,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TransparentBackColor</title>
     <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
-    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <script src="https://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
     <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
     <!-- 构建页面的css样式文件 -->
     <link rel="stylesheet" href="./css/main.css" />
@@ -29,7 +29,7 @@
     window.viewer = new Cesium.Viewer('mapViewer');
     const scene = viewer.scene;
     const widget = viewer.cesiumWidget;
-    open("http://www.supermapol.com/realspace/services/3D-dixingyingxiang/rest/realspace");
+    open("https://www.supermapol.com/realspace/services/3D-dixingyingxiang/rest/realspace");
     function open(url) {
         try {
             const promise = scene.open(url);

@@ -4,18 +4,19 @@
  * @Author: 予程_hepch
  * @Date: 2022-01-24 14:37:39
  * @LastEditors: 予程_hepch
- * @LastEditTime: 2022-01-25 10:06:37
+ * @LastEditTime: 2022-01-25 16:30:12
  * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
 -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ChangeScene</title>
     <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
-    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <script src="https://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
     <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
     <!-- 构建页面的css样式文件 -->
     <link rel="stylesheet" href="./css/main.css" />
@@ -29,10 +30,12 @@
 
 <script>
     //初始化viewer部件
-    window.viewer = new Cesium.Viewer('mapViewer');
+    window.viewer = new Cesium.Viewer('mapViewer', {
+        infoBox: false
+    });
     window.scene = viewer.scene;
     window.widget = viewer.cesiumWidget;
-    open("http://www.supermapol.com/realspace/services/3D-suofeiya_church/rest/realspace");
+    open("https://www.supermapol.com/realspace/services/3D-suofeiya_church/rest/realspace");
     function open(url) {
         try {
             const promise = scene.open(url);
@@ -55,9 +58,11 @@
         //释放对象占用的资源
         window.viewer.destroy();
         console.log(window.viewer);
-        window.viewer = new Cesium.Viewer('mapViewer');
+        window.viewer = new Cesium.Viewer('mapViewer', {
+            infoBox: false
+        });
         window.scene = viewer.scene;
         window.widget = viewer.cesiumWidget;
-        open("http://www.supermapol.com/realspace/services/3D-CBD/rest/realspace");
+        open("https://www.supermapol.com/realspace/services/3D-CBD/rest/realspace");
     }
 </script>

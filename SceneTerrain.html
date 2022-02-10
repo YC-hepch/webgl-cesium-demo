@@ -15,7 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SceneCameraParams</title>
     <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
-    <script src="http://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
+    <script src="https://www.supermapol.com/earth/Build/Cesium/Cesium.js"></script>
     <link rel="stylesheet" href="http://support.supermap.com.cn:8090/webgl/Build/Cesium/Widgets/widgets.css" />
     <!-- 构建页面的css样式文件 -->
     <link rel="stylesheet" href="./css/main.css" />
@@ -29,14 +29,14 @@
         var viewer = new Cesium.Viewer('mapViewer', {
             //创建地形服务提供者的实例，url为SuperMap iServer发布的TIN地形服务
             terrainProvider: new Cesium.CesiumTerrainProvider({
-                url: "http://www.supermapol.com/realspace/services/3D-dixingyingxiang/rest/realspace/datas/DatasetDEM",
+                url: "https://www.supermapol.com/realspace/services/3D-dixingyingxiang/rest/realspace/datas/DatasetDEM",
                 isSct: true,//地形服务源自SuperMap iServer发布时需设置isSct为true
                 invisibility: true
             }),
         });
         //添加SuperMap iServer发布的影像服务 （添加天地图等影像也可呈现效果）
         var layer = viewer.imageryLayers.addImageryProvider(new Cesium.SuperMapImageryProvider({
-            url: "http://www.supermapol.com/realspace/services/3D-dixingyingxiang/rest/realspace/datas/MosaicResult"
+            url: "https://www.supermapol.com/realspace/services/3D-dixingyingxiang/rest/realspace/datas/MosaicResult"
         }));
         viewer.scene.camera.setView({
             destination: new Cesium.Cartesian3(-1206939.1925299785, 5337998.241228442, 3286279.2424502545),
