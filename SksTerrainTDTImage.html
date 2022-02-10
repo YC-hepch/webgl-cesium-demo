@@ -1,0 +1,52 @@
+<!--
+ * @Descripttion: file content
+ * @version: 1.0
+ * @Author: 予程_hepch
+ * @Date: 2022-02-09 15:24:12
+ * @LastEditors: 予程_hepch
+ * @LastEditTime: 2022-02-10 10:33:03
+ * @Copyright: 超图软件华中平台客户中心 (SuperMap Software Co., Ltd. -Central China Platform)
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChangeScene</title>
+    <!--cesuim库、样式文件 建议下载到本地，引入本地资源  -->
+    <script src="./Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="./Cesium/Widgets/widgets.css" />
+    <!-- 构建页面的css样式文件 -->
+    <link rel="stylesheet" href="./css/main.css" />
+</head>
+
+<body>
+    <div id="mapViewer">
+    </div>
+    <script type="text/javascript">
+        function onload(Cesium) {
+            var infoboxContainer = document.getElementById("bubble");
+            //初始化viewer部件
+            var viewer = new Cesium.Viewer('mapViewer', {
+                terrainProvider: new Cesium.CesiumTerrainProvider({
+                    url: "https://www.supermapol.com/realspace/services/3D-stk_terrain/rest/realspace/datas/info/data/path",
+                    requestWaterMask: true,
+                    requestVertexNormals: true,
+                    isSct: false
+                })
+            })
+            viewer.imageryLayers.addImageryProvider(new Cesium.TiandituImageryProvider({
+                    mapStyle: Cesium.TiandituMapsStyle.img_c,
+                    token: "4a00a1dc5387b8ed8adba3374bd87e5e"
+                })); 
+        }
+        if (typeof Cesium !== 'undefined') {
+            window.startupCalled = true;
+            onload(Cesium);
+        }
+    </script>
+
+</body> 
